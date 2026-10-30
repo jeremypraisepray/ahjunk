@@ -1,0 +1,144 @@
+---
+import Icon from './Icon.astro';
+import TruckFill from './TruckFill.astro';
+import { pricing, pricingNote, money } from '../data/business';
+---
+<section class="section section--steel" id="pricing" aria-labelledby="pricing-h">
+  <div class="wrap">
+    <div class="section-head section-head--center">
+      <span class="kicker"><span>Upfront pricing</span></span>
+      <h2 class="h2" id="pricing-h">Pay for space, not hours</h2>
+      <span class="ribbon" aria-hidden="true"></span>
+      <p class="lead">Priced by how much of the truck your stuff fills. Local and non-franchise — no franchise fees, fuel surcharges or surprise add-ons.</p>
+    </div>
+
+    <ul class="tiers">
+      {pricing.map((p) => (
+        <li class:list={['tier card', p.popular && 'tier--pop']} data-reveal>
+          {p.popular && <span class="tier__badge">Most popular</span>}
+          <div class="tier__truck"><TruckFill id={p.id} fill={p.fill} label={`Truck about ${Math.round(p.fill * 100)}% full`} /></div>
+          <h3 class="tier__name">{p.name}</h3>
+          <p class="tier__price"><span class="tier__from">Starting at</span> <span class="tier__amt display">{money(p.from)}</span></p>
+          <p class="tier__blurb">{p.blurb}</p>
+          <ul class="tier__ex">
+            {p.examples.map((e) => <li><Icon name="Check" size={18} class="" />{e}</li>)}
+          </ul>
+        </li>
+      ))}
+    </ul>
+
+    <div class="pricing__foot">
+      <p><Icon name="BadgeDollarSign" size={22} class="" />{pricingNote}</p>
+      <a class="btn btn--lg" href="#quote" data-quote-open>Get my exact price <Icon name="ArrowRight" /></a>
+    </div>
+  </div>
+</section>
+<style>
+  .tiers {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: 16px;
+  }
+  @media (min-width: 900px) {
+    .tiers {
+      grid-template-columns: repeat(3, 1fr);
+      align-items: center;
+      gap: 24px;
+    }
+  }
+  .tier {
+    position: relative;
+    padding: 24px;
+    display: grid;
+    gap: 6px;
+  }
+  .tier--pop {
+    border: 3px solid var(--ah-orange);
+    box-shadow: var(--shadow-lg);
+  }
+  @media (min-width: 900px) {
+    .tier--pop {
+      padding-block: 36px;
+    }
+  }
+  .tier__badge {
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    translate: -50% 0;
+    padding: 4px 14px;
+    background: var(--btn);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    transform: skewX(var(--skew));
+  }
+  .tier__truck {
+    width: 140px;
+    margin-bottom: 6px;
+  }
+  .tier__name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+  }
+  .tier__price {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .tier__from {
+    font-size: 0.9375rem;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .tier__amt {
+    font-size: 3rem;
+    line-height: 1;
+    color: var(--ah-ink);
+  }
+  .tier__blurb {
+    color: var(--muted);
+  }
+  .tier__ex {
+    list-style: none;
+    padding: 0;
+    margin-top: 8px;
+    display: grid;
+    gap: 6px;
+  }
+  .tier__ex li {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  .tier__ex :global(svg) {
+    color: var(--ah-blue);
+    margin-top: 3px;
+    flex: none;
+  }
+  .pricing__foot {
+    margin-top: 32px;
+    display: grid;
+    gap: 16px;
+    justify-items: center;
+    text-align: center;
+  }
+  .pricing__foot p {
+    display: inline-flex;
+    gap: 8px;
+    align-items: flex-start;
+    max-width: 62ch;
+    font-weight: 600;
+  }
+  .pricing__foot p :global(svg) {
+    flex: none;
+    color: var(--orange-text);
+    margin-top: 1px;
+  }
+</style>

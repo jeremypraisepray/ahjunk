@@ -1,0 +1,46 @@
+---
+/** Box-truck illustration whose cargo area fills to `fill` (0–1). Animatable via --fill. */
+interface Props { fill?: number; id: string; class?: string; label?: string }
+const { fill = 0.5, id, class: cls = '', label } = Astro.props;
+const clip = `truck-clip-${id}`;
+---
+<svg
+  class:list={['truck-fill', cls]}
+  viewBox="0 0 136 72"
+  style={`--fill:${fill}`}
+  role={label ? 'img' : undefined}
+  aria-label={label}
+  aria-hidden={label ? undefined : 'true'}
+  data-truck-fill
+>
+  <defs>
+    <clipPath id={clip}><rect x="7" y="7" width="86" height="42" rx="2" /></clipPath>
+  </defs>
+  <rect x="4" y="4" width="92" height="48" rx="4" fill="#fff" stroke="#080D16" stroke-width="3" />
+  <g clip-path={`url(#${clip})`}>
+    <g class="truck-fill__load">
+      <rect x="7" y="7" width="86" height="42" fill="#FD5E01" />
+      <path d="M7 40l10-8 9 6 12-12 10 9 9-7 12 10 10-8 14 9v12H7z" fill="#DE5C08" />
+      <path d="M7 22l14 6M30 12l8 18M52 10l-6 16M70 14l10 12" stroke="#080D16" stroke-opacity=".22" stroke-width="3" />
+    </g>
+  </g>
+  <path d="M96 18h18c3 0 5 1 7 4l9 13c1 2 2 3 2 5v12H96z" fill="#080D16" />
+  <path d="M101 23h12c2 0 3 1 4 2l6 9h-22z" fill="#7FB0FF" />
+  <rect x="2" y="52" width="130" height="6" rx="2" fill="#080D16" />
+  <circle cx="24" cy="60" r="9" fill="#080D16" /><circle cx="24" cy="60" r="3.5" fill="#E9ECF1" />
+  <circle cx="44" cy="60" r="9" fill="#080D16" /><circle cx="44" cy="60" r="3.5" fill="#E9ECF1" />
+  <circle cx="112" cy="60" r="9" fill="#080D16" /><circle cx="112" cy="60" r="3.5" fill="#E9ECF1" />
+</svg>
+<style>
+  .truck-fill {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+  .truck-fill__load {
+    transform-box: view-box;
+    transform-origin: 7px 0;
+    transform: scaleX(var(--fill));
+    transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+</style>

@@ -1,0 +1,85 @@
+---
+import Icon from './Icon.astro';
+---
+<form class="zipcheck" data-zipcheck action="/#quote" method="get">
+  <label for="zc-zip">Check your ZIP</label>
+  <div class="zipcheck__row">
+    <input id="zc-zip" name="zip" type="text" inputmode="numeric" autocomplete="postal-code" maxlength="5" pattern="[0-9]{5}" placeholder="77019" aria-describedby="zc-msg" />
+    <button type="submit" class="btn">Check <Icon name="MapPin" /></button>
+  </div>
+  <p id="zc-msg" class="zipcheck__msg" aria-live="polite" data-zipcheck-msg></p>
+</form>
+<style>
+  .zipcheck {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+    max-width: 440px;
+  }
+  .zipcheck label {
+    font-weight: 700;
+  }
+  .zipcheck__row {
+    display: flex;
+    gap: 8px;
+  }
+  .zipcheck input {
+    flex: 1;
+    width: 100%;
+    min-width: 0;
+    min-height: 48px;
+    padding: 10px 12px;
+    border: 1.5px solid #9aa3b2;
+    border-radius: 10px;
+    font-size: 1.125rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    background: #fff;
+    color: var(--ah-ink);
+  }
+  .zipcheck__msg {
+    font-weight: 600;
+    min-height: 1.5em;
+  }
+  .zipcheck__msg.is-ok {
+    color: var(--ok);
+  }
+  :global(.on-dark) .zipcheck__msg.is-ok {
+    color: #5ee08f;
+  }
+</style>
+<script>
+  import { checkZip } from '../lib/quote';
+  import { track } from '../scripts/analytics';
+  document.querySelectorAll<HTMLFormElement>('[data-zipcheck]').forEach((f) => {
+    const input = f.querySelector('input')!;
+    const msg = f.querySelector<HTMLElement>('[data-zipcheck-msg]')!;
+    const run = () => {
+      const r = checkZip(input.value);
+      msg.classList.toggle('is-ok', r.status === 'served');
+      msg.textContent =
+        r.status === 'served'
+          ? `✓ We serve ${r.zip} — ${r.area}. Same-day slots often open.`
+          : r.status === 'unknown'
+            ? `We may still serve ${r.zip} — we’ll confirm when you request a quote.`
+            : 'Enter a 5-digit ZIP code.';
+      if (r.status !== 'invalid') track('zip_check', { status: r.status, location: 'areas' });
+      return r;
+    };
+    input.addEventListener('input', () => {
+      input.value = input.value.replace(/\D/g, '').slice(0, 5);
+      if (input.value.length === 5) run();
+      else msg.textContent = '';
+    });
+    f.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const r = run();
+      // Carry the ZIP into the quote form if it's on this page
+      const qz = document.querySelector<HTMLInputElement>('[data-quote-form] input[name=zip]');
+      if (qz && r.status !== 'invalid' && !qz.value) {
+        qz.value = input.value;
+        qz.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+    });
+  });
+</script>

@@ -1,0 +1,32 @@
+---
+/** Lucide line icon, inlined at build time (no client JS). */
+import * as icons from 'lucide-static';
+
+interface Props {
+  name: keyof typeof icons;
+  size?: number;
+  class?: string;
+  label?: string;
+  fill?: boolean;
+}
+const { name, size = 24, class: cls = 'icon', label, fill = false } = Astro.props;
+const svg = (icons as Record<string, string>)[name] ?? '';
+const inner = svg.replace(/^[\s\S]*?<svg[^>]*>/, '').replace(/<\/svg>\s*$/, '');
+---
+<svg
+  class={cls}
+  xmlns="http://www.w3.org/2000/svg"
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
+  fill={fill ? 'currentColor' : 'none'}
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden={label ? undefined : 'true'}
+  role={label ? 'img' : undefined}
+  aria-label={label}
+  focusable="false"
+  set:html={inner}
+/>

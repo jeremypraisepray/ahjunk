@@ -1,0 +1,36 @@
+---
+import Prose from '../layouts/Prose.astro';
+import { business } from '../data/business';
+// TODO(owner): have this reviewed by your attorney before launch.
+---
+<Prose title={`Privacy Policy | ${business.name}`} description={`How ${business.name} collects, uses and protects your information.`} heading="Privacy Policy" updated="October 2026">
+  <p>{business.name} (“we”, “us”) respects your privacy. This policy explains what we collect when you use this website or request a quote, and how we use it.</p>
+
+  <h2>What we collect</h2>
+  <ul>
+    <li><strong>Quote details you give us:</strong> first name, mobile phone number, optional email and address, ZIP code, the items you need hauled, timing, notes and any photos you upload.</li>
+    <li><strong>Basic usage data:</strong> pages visited, the ad or link that brought you here (e.g. UTM tags or a Google click ID) and general device/browser information, via analytics cookies if enabled.</li>
+  </ul>
+
+  <h2>How we use it</h2>
+  <ul>
+    <li>To prepare your quote, schedule your job and contact you about it by call, text or email.</li>
+    <li>To keep records of jobs and improve our service and advertising.</li>
+  </ul>
+
+  <h2>Text messages (SMS)</h2>
+  <p>By submitting a quote request you agree to receive calls and text messages from {business.name} about your quote and job. Message frequency varies. Message and data rates may apply. Reply <strong>STOP</strong> to opt out at any time, or <strong>HELP</strong> for help. Consent is not a condition of purchase.</p>
+  <p><strong>We do not sell, rent or share your mobile number or SMS opt-in consent with third parties or affiliates for their marketing or promotional purposes.</strong> Text-messaging originator opt-in data and consent will not be shared with any third parties.</p>
+
+  <h2>Who we share it with</h2>
+  <p>Only service providers that help us run the business — for example our customer-management system (GoHighLevel), our website host, photo storage and email delivery — and only as needed to provide our service. We may also disclose information if required by law.</p>
+
+  <h2>Photos</h2>
+  <p>Photos you upload are stored privately-linked (unguessable URLs) and used only to quote and plan your job.</p>
+
+  <h2>Your choices</h2>
+  <p>You can ask us to update or delete your information at any time by emailing <a href={`mailto:${business.email}`}>{business.email}</a> or calling <a href={business.phone.tel}>{business.phone.display}</a>.</p>
+
+  <h2>Contact</h2>
+  <p>{business.name} · {business.areaLabel} · <a href={business.phone.tel}>{business.phone.display}</a> · <a href={`mailto:${business.email}`}>{business.email}</a></p>
+</Prose>

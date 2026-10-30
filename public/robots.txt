@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /thank-you
+
+Sitemap: https://ahernandezjunkremoval.com/sitemap-index.xml

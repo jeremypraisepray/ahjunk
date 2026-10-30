@@ -1,0 +1,102 @@
+---
+import { Picture } from 'astro:assets';
+import loveseat from '../assets/photos/crew-loading-loveseat-box-truck.webp';
+const steps = [
+  { n: '01', t: 'Snap or call', d: 'Text a photo, call, or book online. You get a straight price fast.' },
+  { n: '02', t: 'We show up on time', d: 'Uniformed crew, a scheduled window and a heads-up call before we arrive.' },
+  { n: '03', t: 'Point. We haul. We sweep.', d: 'We donate and recycle what we can and leave the space broom-clean.' },
+];
+---
+<section class="section section--steel how" aria-labelledby="how-h">
+  <div class="wrap how__grid">
+    <div>
+      <div class="section-head">
+        <span class="kicker"><span>How it works</span></span>
+        <h2 class="h2" id="how-h">Three steps. Zero lifting.</h2>
+        <span class="ribbon" aria-hidden="true"></span>
+      </div>
+      <ol class="steps">
+        {steps.map((s) => (
+          <li class="steps__item" data-reveal>
+            <span class="steps__n display" aria-hidden="true">{s.n}</span>
+            <div>
+              <h3 class="h3">{s.t}</h3>
+              <p>{s.d}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+    <Picture
+      src={loveseat}
+      formats={['avif', 'webp']} fallbackFormat="webp"
+      widths={[480, 768, 1024]}
+      sizes="(min-width: 1024px) 480px, 100vw"
+      alt="A crew member in an orange shirt loading a loveseat into the back of a box truck"
+      class="how__img"
+      loading="lazy"
+    />
+  </div>
+</section>
+<style>
+  .how__grid > * {
+    min-width: 0;
+  }
+  .how__grid {
+    display: grid;
+    gap: 32px;
+    align-items: center;
+  }
+  @media (min-width: 1024px) {
+    .how__grid {
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 56px;
+    }
+  }
+  .steps {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: 22px;
+    position: relative;
+  }
+  .steps::before {
+    content: '';
+    position: absolute;
+    left: 30px;
+    top: 24px;
+    bottom: 24px;
+    width: 5px;
+    background: var(--ah-orange);
+    transform: skewX(var(--skew));
+  }
+  .steps__item {
+    display: grid;
+    grid-template-columns: 64px 1fr;
+    gap: 16px;
+    align-items: start;
+    position: relative;
+  }
+  .steps__n {
+    display: grid;
+    place-items: center;
+    width: 64px;
+    height: 64px;
+    font-size: 2rem;
+    color: #fff;
+    background: var(--ah-ink);
+    transform: skewX(var(--skew));
+    border-bottom: 4px solid var(--ah-orange);
+  }
+  .steps__item p {
+    color: var(--muted);
+    margin-top: 4px;
+  }
+  .how :global(.how__img) {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+  }
+</style>

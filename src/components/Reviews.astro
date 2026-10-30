@@ -1,0 +1,149 @@
+---
+import Icon from './Icon.astro';
+import Stars from './Stars.astro';
+import { business } from '../data/business';
+import reviewsData from '../data/reviews.json';
+
+interface Props { filterArea?: string; heading?: string }
+const { filterArea, heading = 'Houston says it best' } = Astro.props;
+const all = reviewsData.reviews;
+const list = filterArea ? all.filter((r) => r.area === filterArea) : all;
+const g = business.google;
+---
+{list.length > 0 && (
+<section class="section" id="reviews" aria-labelledby="reviews-h">
+  <div class="wrap">
+    <div class="rev-head">
+      <div class="section-head">
+        <span class="kicker"><span>Reviews</span></span>
+        <h2 class="h2" id="reviews-h">{heading}</h2>
+        <span class="ribbon" aria-hidden="true"></span>
+      </div>
+      <div class="rev-score">
+        <p class="rev-score__big display">{g.rating.toFixed(1)}</p>
+        <div>
+          <Stars rating={g.rating} label={`${g.rating.toFixed(1)} out of 5 stars`} />
+          <p>on Google{g.reviewCount ? ` · ${g.reviewCount} reviews` : ''}</p>
+          <p class="rev-links">
+            {g.gbpUrl && <a href={g.gbpUrl} target="_blank" rel="noopener">Read all reviews on Google</a>}
+            {g.reviewUrl && <a href={g.reviewUrl} target="_blank" rel="noopener">Leave a review</a>}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <ul class="rev-list" aria-label="Customer reviews">
+      {list.map((r) => (
+        <li class="rev card" data-reveal>
+          <Stars rating={r.rating} />
+          <blockquote><p>“{r.text}”</p></blockquote>
+          <p class="rev__who">
+            <span class="rev__avatar" aria-hidden="true">{r.name[0]}</span>
+            <span><strong>{r.name}</strong><br /><span class="rev__meta">{r.area} · {r.service}</span></span>
+            {r.source === 'google' && <span class="rev__g" title="Review from Google"><Icon name="Star" size={14} class="" /> Google</span>}
+          </p>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+)}
+<style>
+  .rev-head {
+    display: grid;
+    gap: 8px;
+    align-items: end;
+    margin-bottom: 28px;
+  }
+  .rev-head .section-head {
+    margin-bottom: 0;
+  }
+  @media (min-width: 900px) {
+    .rev-head {
+      grid-template-columns: 1fr auto;
+    }
+  }
+  .rev-score {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+  }
+  .rev-score__big {
+    font-size: 4.5rem;
+    line-height: 0.9;
+  }
+  .rev-links {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    font-weight: 700;
+  }
+  .rev-links:empty {
+    display: none;
+  }
+  .rev-list {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: min(86%, 360px);
+    gap: 14px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 8px;
+    margin-inline: calc(var(--gutter) * -1);
+    padding-inline: var(--gutter);
+    scroll-padding-inline: var(--gutter);
+  }
+  @media (min-width: 900px) {
+    .rev-list {
+      grid-auto-flow: row;
+      grid-template-columns: repeat(3, 1fr);
+      overflow: visible;
+      margin-inline: 0;
+      padding-inline: 0;
+      gap: 20px;
+    }
+  }
+  .rev {
+    scroll-snap-align: start;
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .rev blockquote {
+    flex: 1;
+    font-size: 1.0625rem;
+  }
+  .rev__who {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    line-height: 1.25;
+  }
+  .rev__avatar {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--ah-gradient);
+    color: #fff;
+    font-weight: 700;
+    flex: none;
+  }
+  .rev__meta {
+    color: var(--muted);
+    font-size: 0.9375rem;
+  }
+  .rev__g {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: var(--ah-blue);
+  }
+</style>

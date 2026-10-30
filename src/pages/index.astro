@@ -1,0 +1,37 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+import TrustBar from '../components/TrustBar.astro';
+import Services from '../components/Services.astro';
+import HowItWorks from '../components/HowItWorks.astro';
+import Gallery from '../components/Gallery.astro';
+import Pricing from '../components/Pricing.astro';
+import Reviews from '../components/Reviews.astro';
+import AreasSection from '../components/AreasSection.astro';
+import WhyUs from '../components/WhyUs.astro';
+import FAQ from '../components/FAQ.astro';
+import CTABand from '../components/CTABand.astro';
+import heroImg from '../assets/photos/crew-loading-couch-dump-trailer.webp';
+import { business } from '../data/business';
+import { faq } from '../data/faq';
+---
+<Base
+  title={`Junk Removal Houston, TX | Same-Day Pickup | ${business.name}`}
+  description={`Same-day & next-day junk removal across Houston — furniture, appliances, garage & estate cleanouts. Upfront pricing, licensed & insured, 7 days a week. Call ${business.phone.display}.`}
+  hasQuoteForm
+>
+  <Hero image={heroImg}>
+    <h1 id="hero-h" slot="heading">Junk gone. <span class="accent">Today.</span><span class="h1-sub">{business.tagline}</span></h1>
+    <p slot="sub" class="hero__sub">Same-day &amp; next-day junk removal across Houston — River Oaks to Kingwood. Upfront pricing. We do all the lifting.</p>
+  </Hero>
+  <TrustBar />
+  <Services />
+  <HowItWorks />
+  <Gallery />
+  <Pricing />
+  <Reviews />
+  <AreasSection />
+  <WhyUs />
+  <FAQ items={faq} />
+  <CTABand />
+</Base>

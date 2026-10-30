@@ -1,0 +1,131 @@
+---
+/**
+ * Stylized Greater Houston map — no external map embed. Dots are projected from
+ * real lat/lng; rings are abstract stand-ins for Loop 610, Beltway 8 and the Grand Parkway.
+ */
+import { areas, type Area } from '../data/areas';
+import { business } from '../data/business';
+
+interface Props { highlight?: string }
+const { highlight } = Astro.props;
+
+// Radial "fisheye": distance from downtown is square-rooted so the dense inner Loop spreads out.
+const K = 56; // px per sqrt(mile)
+const cx = 440, cy = 350;
+const cosLat = Math.cos((business.geo.lat * Math.PI) / 180);
+const project = (a: Pick<Area, 'lat' | 'lng'>) => {
+  const dx = (a.lng - business.geo.lng) * cosLat * 69;
+  const dy = (a.lat - business.geo.lat) * 69;
+  const d = Math.hypot(dx, dy) || 1;
+  const r = K * Math.sqrt(d);
+  return { x: cx + (dx / d) * r, y: cy - (dy / d) * r };
+};
+const ring = (miles: number) => K * Math.sqrt(miles);
+const pts = areas.map((a) => ({ ...a, ...project(a) }));
+// Label side per area (l/r/t/b) to avoid collisions; default right.
+const side: Record<string, 'l' | 'r' | 't' | 'b'> = {
+  'river-oaks': 't', 'downtown-houston': 'r', 'west-university-place': 'r', bellaire: 'l', 'hedwig-village': 't',
+  'energy-corridor': 'b', 'sugar-land': 'l', fulshear: 'l', katy: 'l', cypress: 'l', richmond: 'b', kingwood: 'r',
+  'the-woodlands': 'r', humble: 'r', pearland: 'b', 'clear-lake': 'r', 'the-heights': 'r', 'missouri-city': 'l',
+  'galleria-uptown': 'l', memorial: 't', 'spring-branch': 't', meyerland: 'b', montrose: 'r', spring: 'l', pasadena: 'r',
+};
+const labelPos = (p: { x: number; y: number; slug: string }) => {
+  const s = side[p.slug] ?? 'r';
+  if (s === 'l') return { x: p.x - 12, y: p.y + 6, anchor: 'end' };
+  if (s === 't') return { x: p.x, y: p.y - 14, anchor: 'middle' };
+  if (s === 'b') return { x: p.x, y: p.y + 26, anchor: 'middle' };
+  return { x: p.x + 12, y: p.y + 6, anchor: 'start' };
+};
+const mobileLabel = new Set(['river-oaks', 'downtown-houston', 'kingwood', 'sugar-land', 'fulshear', 'bellaire', 'the-woodlands', 'clear-lake', 'katy']);
+const showLabel = (a: Area) => a.primary || a.slug === highlight || ['the-woodlands', 'katy', 'pearland', 'clear-lake', 'cypress', 'humble', 'the-heights'].includes(a.slug);
+---
+<svg class="map" viewBox="0 0 800 700" role="img" aria-labelledby="map-title">
+  <title id="map-title">Map of Greater Houston showing the neighborhoods and suburbs A&H Junk Removal serves</title>
+  <defs>
+    <radialGradient id="map-bg" cx="50%" cy="47%" r="65%">
+      <stop offset="0" stop-color="#0d2550" />
+      <stop offset="1" stop-color="#080D16" />
+    </radialGradient>
+    <linearGradient id="map-ring" x1="0" x2="1">
+      <stop offset="0" stop-color="#DE5C08" />
+      <stop offset="1" stop-color="#0248A9" />
+    </linearGradient>
+  </defs>
+  <rect width="800" height="700" rx="20" fill="url(#map-bg)" />
+  <!-- Galveston Bay hint -->
+  <path d="M650 560c40 6 80 30 110 34 20 3 40 0 40 0v106H580c20-30 30-60 40-90 6-20 10-46 30-50z" fill="#0248A9" opacity=".28" />
+  <!-- Highway rings (abstract) -->
+  <circle cx={cx} cy={cy} r={ring(6)} fill="none" stroke="url(#map-ring)" stroke-width="3" opacity=".9" />
+  <circle cx={cx} cy={cy} r={ring(13)} fill="none" stroke="url(#map-ring)" stroke-width="2.5" opacity=".6" stroke-dasharray="2 6" />
+  <circle cx={cx} cy={cy} r={ring(27)} fill="none" stroke="url(#map-ring)" stroke-width="2" opacity=".4" stroke-dasharray="1 8" />
+  <!-- I-10 / I-45 / US-59 spokes -->
+  <g stroke="#fff" stroke-opacity=".08" stroke-width="2">
+    <line x1="0" y1={cy} x2="800" y2={cy} />
+    <line x1={cx - 160} y1="700" x2={cx + 80} y2="0" />
+    <line x1={cx - 330} y1={cy + 260} x2={cx + 330} y2={cy - 260} />
+  </g>
+  <text x={cx + ring(6) + 6} y={cy - 8} class="map__ring">610</text>
+  <text x={cx + ring(13) + 6} y={cy - 8} class="map__ring">BW 8</text>
+  <text x={cx + ring(27) - 30} y={cy - 8} class="map__ring">99</text>
+
+  {pts.map((p) => (
+    <g class:list={['map__pt', p.primary && 'is-primary', p.slug === highlight && 'is-hl']}>
+      <circle cx={p.x} cy={p.y} r={p.slug === highlight ? 10 : p.primary ? 7 : 4.5} />
+      {showLabel(p) && (() => { const l = labelPos(p); return <text class:list={[!mobileLabel.has(p.slug) && p.slug !== highlight && 'is-minor']} x={l.x} y={l.y} text-anchor={l.anchor}>{p.name}</text>; })()}
+
+    </g>
+  ))}
+  <g class="map__hq">
+    <circle cx={cx} cy={cy} r="16" fill="#FD5E01" opacity=".25" />
+    <circle cx={cx} cy={cy} r="5" fill="#fff" />
+  </g>
+</svg>
+<style>
+  .map {
+    width: 100%;
+    height: auto;
+    border-radius: 20px;
+  }
+  .map text {
+    font: 600 17px var(--font-body);
+    fill: #e9ecf1;
+    paint-order: stroke;
+    stroke: #080d16;
+    stroke-width: 4px;
+  }
+  .map .map__ring {
+    font: 700 13px var(--font-body);
+    fill: #ff8a3d;
+    stroke: none;
+    letter-spacing: 0.06em;
+  }
+  @media (max-width: 640px) {
+    .map text {
+      font-size: 24px;
+      stroke-width: 6px;
+    }
+    .map text.is-minor,
+    .map .map__ring {
+      display: none;
+    }
+  }
+  .map__pt circle {
+    fill: #7fb0ff;
+    opacity: 0.85;
+  }
+  .map__pt.is-primary circle {
+    fill: #fd5e01;
+    opacity: 1;
+    stroke: #fff;
+    stroke-width: 2;
+  }
+  .map__pt.is-hl circle {
+    fill: #fd8815;
+    stroke-width: 3;
+  }
+  .map__pt.is-hl text {
+    font-size: 20px;
+    font-weight: 700;
+    fill: #fff;
+  }
+</style>

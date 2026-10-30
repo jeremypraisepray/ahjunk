@@ -1,0 +1,22 @@
+---
+import Prose from '../layouts/Prose.astro';
+import { business, cannotTake } from '../data/business';
+// TODO(owner): have this reviewed by your attorney before launch.
+---
+<Prose title={`Terms of Service | ${business.name}`} description={`Terms for using the ${business.name} website and services.`} heading="Terms of Service" updated="October 2026">
+  <p>These terms apply to your use of this website and to junk removal services provided by {business.name}.</p>
+  <h2>Quotes &amp; pricing</h2>
+  <p>Prices shown online are starting prices based on truck volume. Your exact price is confirmed on-site before any work begins; you approve it, then we load. Heavy materials (concrete, tile, dirt, shingles) and specialty items may be priced differently.</p>
+  <h2>Scheduling</h2>
+  <p>We offer same-day and next-day service when available. Arrival windows are estimates; we’ll call ahead before arriving.</p>
+  <h2>Items we can’t accept</h2>
+  <p>We do not haul hazardous materials, including: {cannotTake.join(', ').toLowerCase()}. You confirm that items you ask us to remove are yours to dispose of.</p>
+  <h2>Payment</h2>
+  <p>Payment is due when the job is complete.</p>
+  <h2>Text messages</h2>
+  <p>By requesting a quote you agree to receive calls and texts about your request. Reply STOP to opt out, HELP for help. See our <a href="/privacy/">Privacy Policy</a>.</p>
+  <h2>Liability</h2>
+  <p>{business.name} is licensed and insured. We take care to protect your property; please point out fragile areas before we start.</p>
+  <h2>Contact</h2>
+  <p><a href={business.phone.tel}>{business.phone.display}</a> · <a href={`mailto:${business.email}`}>{business.email}</a></p>
+</Prose>

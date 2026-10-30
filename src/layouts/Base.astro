@@ -1,0 +1,96 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import StickyActionBar from '../components/StickyActionBar.astro';
+import SchemaLocalBusiness from '../components/SchemaLocalBusiness.astro';
+import { business } from '../data/business';
+
+interface Props {
+  title: string;
+  description: string;
+  /** True when this page renders the quote form (header CTA scrolls to it). */
+  hasQuoteForm?: boolean;
+  noindex?: boolean;
+  ogImage?: string;
+}
+const { title, description, hasQuoteForm = false, noindex = false, ogImage = '/og.jpg' } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const quoteHref = hasQuoteForm ? '#quote' : '/#quote';
+const ga4 = import.meta.env.PUBLIC_GA4_ID;
+const gads = import.meta.env.PUBLIC_GADS_ID;
+const analyticsCfg = {
+  ga4: ga4 || '',
+  gads: gads || '',
+  leadLabel: import.meta.env.PUBLIC_GADS_LEAD_LABEL || '',
+  callLabel: import.meta.env.PUBLIC_GADS_CALL_LABEL || '',
+};
+---
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <script is:inline>document.documentElement.classList.replace('no-js', 'js');</script>
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
+    <meta name="theme-color" content="#080D16" />
+    <meta name="format-detection" content="telephone=no" />
+
+    <link rel="preload" href="/fonts/barlow-condensed-latin-800-italic.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/barlow-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <slot name="head" />
+
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={business.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={new URL(ogImage, Astro.site).href} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="en_US" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={new URL(ogImage, Astro.site).href} />
+
+    <SchemaLocalBusiness />
+    <slot name="schema" />
+
+    <script is:inline define:vars={{ analyticsCfg }}>
+      window.AH_ANALYTICS = analyticsCfg;
+      window.dataLayer = window.dataLayer || [];
+      window.gtag = window.gtag || function () { window.dataLayer.push(arguments); };
+    </script>
+    {(ga4 || gads) && (
+      <>
+        <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${ga4 || gads}`}></script>
+        <script is:inline>
+          gtag('js', new Date());
+          if (AH_ANALYTICS.ga4) gtag('config', AH_ANALYTICS.ga4);
+          if (AH_ANALYTICS.gads) gtag('config', AH_ANALYTICS.gads);
+        </script>
+      </>
+    )}
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <Header quoteHref={quoteHref} />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+    <StickyActionBar quoteHref={quoteHref} />
+    <script>
+      import '../scripts/site';
+    </script>
+  </body>
+</html>

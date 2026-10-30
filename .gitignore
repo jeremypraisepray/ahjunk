@@ -1,0 +1,18 @@
+# deps / build
+node_modules/
+dist/
+.astro/
+.vercel/
+.netlify/
+
+# secrets — never commit real credentials
+.env
+.env.*
+!.env.example
+.env*.local
+
+# misc
+.DS_Store
+*.log
+/test-results/
+/playwright-report/

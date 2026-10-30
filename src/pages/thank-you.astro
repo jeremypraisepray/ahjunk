@@ -1,0 +1,49 @@
+---
+/** Conversion page for the no-JS form fallback (and ad-platform URL-based goals). */
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { business } from '../data/business';
+const sms = `${business.phone.sms}?&body=${encodeURIComponent(business.smsBody)}`;
+---
+<Base title={`Thanks — we got your request | ${business.name}`} description="Your junk removal quote request was received." noindex>
+  <section class="ty">
+    <div class="wrap ty__in">
+      <Icon name="CircleCheck" size={56} class="ty__icon" />
+      <h1 class="h2">Got it<span data-ty-name></span>!</h1>
+      <p class="lead" data-ty-msg>We’ll text you within {business.responseMinutes} minutes during business hours ({business.hours.days}, {business.hours.label}).</p>
+      <div class="ty__btns">
+        <a class="btn btn--lg" href={business.phone.tel} data-track="click_call" data-track-loc="thank_you"><Icon name="Phone" />Need it faster? Call {business.phone.display}</a>
+        <a class="btn btn--ghost btn--lg" href={sms} data-track="click_text" data-track-loc="thank_you"><Icon name="Camera" />Add more photos by text</a>
+      </div>
+      <a href="/">← Back to home</a>
+    </div>
+  </section>
+</Base>
+<style>
+  .ty {
+    padding-block: 72px 96px;
+    text-align: center;
+  }
+  .ty__in {
+    display: grid;
+    gap: 18px;
+    justify-items: center;
+  }
+  .ty :global(.ty__icon) {
+    color: var(--ok);
+  }
+  .ty__btns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+  }
+</style>
+<script>
+  import { track } from '../scripts/analytics';
+  const name = new URLSearchParams(location.search).get('name');
+  if (name) document.querySelector('[data-ty-name]')!.textContent = `, ${name.slice(0, 40)}`;
+  const h = Number(new Intl.DateTimeFormat('en-US', { timeZone: 'America/Chicago', hour: 'numeric', hourCycle: 'h23' }).format(new Date()));
+  if (h < 7 || h >= 19) document.querySelector('[data-ty-msg]')!.textContent = 'We’re off the clock right now — we’ll reach out first thing at 7 AM.';
+  track('quote_submit', { method: 'no_js_fallback' });
+</script>

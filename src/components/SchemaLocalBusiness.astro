@@ -1,0 +1,43 @@
+---
+/** LocalBusiness JSON-LD. aggregateRating is emitted ONLY when a real review count exists. */
+import { business } from '../data/business';
+import { areas } from '../data/areas';
+import { services } from '../data/services';
+import logo from '../assets/brand/AH-junk-removal-logo-google-1080.png';
+
+const sameAs = [business.google.gbpUrl, ...Object.values(business.socials)].filter(Boolean);
+const data: Record<string, unknown> = {
+  '@context': 'https://schema.org',
+  '@type': ['LocalBusiness', 'HomeAndConstructionBusiness'],
+  '@id': `${business.url}/#business`,
+  name: business.name,
+  url: `${business.url}/`,
+  telephone: business.phone.e164,
+  email: business.email,
+  image: new URL(logo.src, business.url).href,
+  logo: new URL(logo.src, business.url).href,
+  priceRange: business.priceRange,
+  address: { '@type': 'PostalAddress', addressLocality: business.city, addressRegion: business.region, addressCountry: business.country },
+  geo: { '@type': 'GeoCoordinates', latitude: business.geo.lat, longitude: business.geo.lng },
+  openingHoursSpecification: [{
+    '@type': 'OpeningHoursSpecification',
+    dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+    opens: `${String(business.hours.open).padStart(2, '0')}:00`,
+    closes: `${String(business.hours.close).padStart(2, '0')}:00`,
+  }],
+  areaServed: [
+    { '@type': 'City', name: 'Houston', containedInPlace: { '@type': 'State', name: 'Texas' } },
+    ...areas.map((a) => ({ '@type': 'Place', name: `${a.name}, TX` })),
+  ],
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: 'Junk removal services',
+    itemListElement: services.map((s) => ({ '@type': 'Offer', itemOffered: { '@type': 'Service', name: s.title, url: `${business.url}/services/${s.slug}/` } })),
+  },
+};
+if (sameAs.length) data.sameAs = sameAs;
+if (business.google.reviewCount && business.google.rating) {
+  data.aggregateRating = { '@type': 'AggregateRating', ratingValue: business.google.rating, reviewCount: business.google.reviewCount };
+}
+---
+<script type="application/ld+json" set:html={JSON.stringify(data)} />

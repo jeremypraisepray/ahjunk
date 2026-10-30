@@ -1,0 +1,112 @@
+---
+import { Picture } from 'astro:assets';
+import Icon from './Icon.astro';
+import crew from '../assets/photos/crew-smiling-loaded-trailer.webp';
+import { business } from '../data/business';
+const o = business.owner;
+const points = [
+  { icon: 'House', t: 'Local & family-run', d: 'Houston owned and operated. You talk to the people doing the work.' },
+  { icon: 'BadgeDollarSign', t: 'No franchise fees', d: 'No national overhead baked into your price — just honest, volume-based pricing.' },
+  { icon: 'Clock', t: 'On time, in uniform', d: 'Scheduled windows, a call-ahead, and a crew that respects your home.' },
+  { icon: 'HandHeart', t: 'Donate & recycle first', d: 'Usable items go to local charities. The landfill is the last stop.' },
+];
+---
+<section class="section why" id="about" aria-labelledby="why-h">
+  <div class="wrap why__grid">
+    <div class="why__media" data-reveal>
+      <Picture src={crew} formats={['avif', 'webp']} fallbackFormat="webp" widths={[480, 768, 1200]} sizes="(min-width: 1024px) 560px, 100vw" alt="A smiling A&H crew member standing behind a fully loaded dump trailer" class="why__img" loading="lazy" />
+      {o.firstName && (
+        <div class="owner card">
+          <p class="owner__sig">— {o.firstName}</p>
+          <p class="owner__role">Owner, {business.name}{business.foundedYear ? ` · since ${business.foundedYear}` : ''}</p>
+        </div>
+      )}
+    </div>
+    <div>
+      <div class="section-head">
+        <span class="kicker"><span>{o.firstName ? `Meet ${o.firstName}` : 'Why A&H'}</span></span>
+        <h2 class="h2" id="why-h">Houston’s hardest-working haul team</h2>
+        <span class="ribbon" aria-hidden="true"></span>
+        {o.story ? <p class="lead">{o.story}</p> : <p class="lead">We’re a local crew, not a call center. When you book A&H, the folks who quote you are the folks who show up, lift, load and sweep.</p>}
+      </div>
+      <ul class="why__pts">
+        {points.map((p) => <li><span class="why__ic"><Icon name={p.icon as any} size={22} class="" /></span><div><h3>{p.t}</h3><p>{p.d}</p></div></li>)}
+      </ul>
+    </div>
+  </div>
+</section>
+<style>
+  .why__grid > * {
+    min-width: 0;
+  }
+  .why__grid {
+    display: grid;
+    gap: 36px;
+    align-items: center;
+  }
+  @media (min-width: 1024px) {
+    .why__grid {
+      grid-template-columns: 0.95fr 1.05fr;
+      gap: 64px;
+    }
+  }
+  .why__media {
+    position: relative;
+  }
+  .why :global(.why__img) {
+    width: 100%;
+    aspect-ratio: 5 / 4;
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+  }
+  .owner {
+    position: absolute;
+    right: 16px;
+    bottom: -20px;
+    padding: 14px 18px;
+  }
+  .owner__sig {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 800;
+    font-size: 1.75rem;
+  }
+  .owner__role {
+    font-size: 0.875rem;
+    color: var(--muted);
+  }
+  .why__pts {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: 18px;
+  }
+  @media (min-width: 640px) {
+    .why__pts {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .why__pts li {
+    display: flex;
+    gap: 12px;
+  }
+  .why__ic {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    flex: none;
+    border-radius: 10px;
+    background: #e8f0fb;
+    color: var(--ah-blue);
+  }
+  .why__pts h3 {
+    font-size: 1.0625rem;
+    margin-bottom: 2px;
+    line-height: 1.3;
+  }
+  .why__pts p {
+    color: var(--muted);
+    font-size: 0.9625rem;
+  }
+</style>

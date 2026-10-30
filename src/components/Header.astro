@@ -1,0 +1,207 @@
+---
+import Logo from './Logo.astro';
+import Icon from './Icon.astro';
+import OpenStatus from './OpenStatus.astro';
+import { business } from '../data/business';
+
+interface Props { quoteHref: string }
+const { quoteHref } = Astro.props;
+const onHome = Astro.url.pathname === '/';
+const p = onHome ? '' : '/';
+const nav = [
+  { href: `${p}#services`, label: 'Services' },
+  { href: `${p}#areas`, label: 'Areas' },
+  { href: `${p}#pricing`, label: 'Pricing' },
+  { href: `${p}#reviews`, label: 'Reviews' },
+  { href: `${p}#faq`, label: 'FAQ' },
+];
+---
+<header class="site-header">
+  <div class="wrap site-header__in">
+    <Logo size={40} />
+
+    <nav class="site-nav" aria-label="Main">
+      <ul>
+        {nav.map((n) => <li><a href={n.href}>{n.label}</a></li>)}
+      </ul>
+    </nav>
+
+    <div class="site-header__actions">
+      <div class="site-header__phone">
+        <a class="phone-link" href={business.phone.tel} data-track="click_call" data-track-loc="header">
+          <Icon name="Phone" size={18} class="" />{business.phone.display}
+        </a>
+        <OpenStatus />
+      </div>
+      <a class="btn site-header__cta" href={quoteHref} data-quote-open>Get Free Quote</a>
+      <a class="icon-btn mobile-only" href={business.phone.tel} data-track="click_call" data-track-loc="header" aria-label={`Call ${business.phone.display}`}>
+        <Icon name="Phone" size={22} class="" />
+      </a>
+      <details class="menu mobile-only">
+        <summary class="icon-btn" aria-label="Menu"><Icon name="Menu" size={24} class="" /></summary>
+        <div class="menu__panel">
+          <ul>
+            {nav.map((n) => <li><a href={n.href}>{n.label}</a></li>)}
+          </ul>
+          <a class="btn btn--block" href={quoteHref} data-quote-open>Get Free Quote</a>
+          <a class="btn btn--ghost btn--block" href={business.phone.tel} data-track="click_call" data-track-loc="menu"><Icon name="Phone" />Call {business.phone.display}</a>
+          <OpenStatus />
+        </div>
+      </details>
+    </div>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgb(255 255 255 / 0.96);
+    backdrop-filter: saturate(1.4) blur(10px);
+    border-bottom: 1px solid rgb(8 13 22 / 0.08);
+  }
+  .site-header::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 -1px 0;
+    height: 3px;
+    background: var(--ah-gradient);
+  }
+  .site-header__in {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    height: var(--header-h);
+  }
+  .site-nav {
+    display: none;
+  }
+  .site-nav ul,
+  .menu__panel ul {
+    list-style: none;
+    padding: 0;
+  }
+  .site-nav ul {
+    display: flex;
+    gap: 4px;
+  }
+  .site-nav a {
+    display: block;
+    padding: 10px 12px;
+    color: var(--ah-ink);
+    text-decoration: none;
+    font-weight: 600;
+    border-radius: 8px;
+  }
+  .site-nav a:hover {
+    background: var(--ah-steel);
+  }
+  .site-header__actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .site-header__phone,
+  .site-header__cta {
+    display: none;
+  }
+  .phone-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 700;
+    font-size: 1.0625rem;
+    color: var(--ah-ink);
+    text-decoration: none;
+  }
+  .phone-link:hover {
+    color: var(--ah-blue);
+    text-decoration: underline;
+  }
+  .phone-link :global(svg) {
+    width: 18px;
+    height: 18px;
+    color: var(--btn);
+  }
+  .icon-btn {
+    display: inline-grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    color: var(--ah-ink);
+    list-style: none;
+  }
+  .icon-btn::-webkit-details-marker {
+    display: none;
+  }
+  .icon-btn:hover {
+    background: var(--ah-steel);
+  }
+  .menu {
+    position: relative;
+  }
+  .menu[open] summary {
+    background: var(--ah-steel);
+  }
+  .menu__panel {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 8px);
+    width: min(320px, calc(100vw - 32px));
+    display: grid;
+    gap: 10px;
+    padding: 12px;
+    background: #fff;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+  }
+  .menu__panel a:not(.btn) {
+    display: block;
+    padding: 12px;
+    font-weight: 600;
+    font-size: 1.125rem;
+    color: var(--ah-ink);
+    text-decoration: none;
+    border-radius: 8px;
+  }
+  .menu__panel a:not(.btn):hover {
+    background: var(--ah-steel);
+  }
+  .menu__panel :global(.open-status) {
+    justify-self: center;
+    padding-block: 4px;
+  }
+  @media (min-width: 768px) {
+    .site-header__cta {
+      display: inline-flex;
+      min-height: 44px;
+      padding: 10px 18px;
+      font-size: 1rem;
+    }
+  }
+  @media (min-width: 1024px) {
+    .mobile-only {
+      display: none;
+    }
+    .site-nav {
+      display: block;
+    }
+    .site-header__phone {
+      display: grid;
+      justify-items: end;
+      gap: 0;
+      margin-right: 8px;
+    }
+  }
+  @media (min-width: 1024px) and (max-width: 1180px) {
+    .site-nav a {
+      padding-inline: 8px;
+    }
+    .site-header__phone :global(.open-status) {
+      display: none;
+    }
+  }
+</style>

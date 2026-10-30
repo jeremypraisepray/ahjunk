@@ -1,0 +1,150 @@
+---
+import { Picture } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import Hero from '../../components/Hero.astro';
+import TrustBar from '../../components/TrustBar.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import Pricing from '../../components/Pricing.astro';
+import Reviews from '../../components/Reviews.astro';
+import FAQ from '../../components/FAQ.astro';
+import CTABand from '../../components/CTABand.astro';
+import Icon from '../../components/Icon.astro';
+import { services, type Service } from '../../data/services';
+import { primaryAreas } from '../../data/areas';
+import { business, pricingNote } from '../../data/business';
+import { faq as homeFaq } from '../../data/faq';
+import { heroPhotos, defaultHero } from '../../data/photos';
+
+export function getStaticPaths() {
+  return services.map((s) => ({ params: { slug: s.slug }, props: { service: s } }));
+}
+const { service } = Astro.props as { service: Service };
+const img = heroPhotos[service.slug] ?? defaultHero;
+const faqs = [...service.faqs, homeFaq[0], homeFaq[1], homeFaq[4]];
+const others = services.filter((s) => s.slug !== service.slug).slice(0, 6);
+const url = `${business.url}/services/${service.slug}/`;
+const serviceLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: `${service.title} in Houston, TX`,
+  serviceType: service.title,
+  description: service.intro,
+  url,
+  provider: { '@id': `${business.url}/#business` },
+  areaServed: { '@type': 'City', name: 'Houston, TX' },
+};
+---
+<Base
+  title={`${service.title} Houston, TX | Same-Day | ${business.name}`}
+  description={`${service.short} Same-day ${service.title.toLowerCase()} across Houston. Upfront, volume-based pricing. Call ${business.phone.display}.`}
+  hasQuoteForm
+>
+  <script type="application/ld+json" slot="schema" set:html={JSON.stringify(serviceLd)} />
+  <Breadcrumbs items={[{ name: 'Home', href: '/' }, { name: 'Services', href: '/#services' }, { name: service.title, href: `/services/${service.slug}/` }]} />
+  <Hero image={img} kicker={`Houston, TX · ${service.title}`} preselect={service.item} formTitle="Get a free quote in 60 seconds">
+    <h1 id="hero-h" slot="heading">{service.title} <span class="accent">in Houston</span></h1>
+    <p slot="sub" class="hero__sub">{service.intro}</p>
+  </Hero>
+  <TrustBar />
+
+  <section class="section" aria-labelledby="inc-h">
+    <div class="wrap svc-detail">
+      <div>
+        <div class="section-head">
+          <span class="kicker"><span>What’s included</span></span>
+          <h2 class="h2" id="inc-h">We lift. You point.</h2>
+          <span class="ribbon" aria-hidden="true"></span>
+          {/* TODO(copy): 2–3 unique paragraphs per service for SEO depth */}
+          <p class="lead">{service.short} Every job includes labor, loading, hauling, disposal and a sweep-up — and we donate or recycle whatever we can.</p>
+        </div>
+        <ul class="inc">
+          {service.included.map((i) => <li><Icon name="CircleCheck" />{i}</li>)}
+        </ul>
+        <p class="note"><Icon name="BadgeDollarSign" size={20} class="" />{pricingNote}</p>
+        <a class="btn btn--lg" href="#quote" data-quote-open>Get my free quote <Icon name="ArrowRight" /></a>
+      </div>
+      <Picture src={img} formats={['avif', 'webp']} fallbackFormat="webp" widths={[480, 768, 1200]} sizes="(min-width: 1024px) 520px, 100vw" alt={`A&H crew at work — ${service.title.toLowerCase()}`} class="svc-detail__img" loading="lazy" />
+    </div>
+  </section>
+
+  <Pricing />
+  <Reviews />
+  <FAQ items={faqs} heading={`${service.title}: common questions`} />
+
+  <section class="section" aria-labelledby="more-h">
+    <div class="wrap">
+      <h2 class="h3" id="more-h">More junk removal services</h2>
+      <ul class="link-list">{others.map((s) => <li><a href={`/services/${s.slug}/`}>{s.title}</a></li>)}</ul>
+      <h2 class="h3" style="margin-top:28px">Serving Greater Houston</h2>
+      <ul class="link-list">{primaryAreas.map((a) => <li><a href={`/areas/${a.slug}/`}>{a.name}</a></li>)}</ul>
+    </div>
+  </section>
+  <CTABand />
+</Base>
+<style>
+  .svc-detail > * {
+    min-width: 0;
+  }
+  .svc-detail {
+    display: grid;
+    gap: 32px;
+    align-items: center;
+  }
+  @media (min-width: 1024px) {
+    .svc-detail {
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 56px;
+    }
+  }
+  .inc {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  @media (min-width: 640px) {
+    .inc {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .inc li {
+    display: flex;
+    gap: 10px;
+    font-weight: 600;
+  }
+  .inc :global(svg) {
+    color: var(--ah-blue);
+  }
+  .note {
+    display: flex;
+    gap: 8px;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+  .note :global(svg) {
+    flex: none;
+    color: var(--orange-text);
+    margin-top: 2px;
+  }
+  .svc-detail :global(.svc-detail__img) {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+  }
+  .link-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 20px;
+    margin-top: 12px;
+  }
+  .link-list a {
+    display: inline-block;
+    padding-block: 6px;
+    font-weight: 600;
+  }
+</style>

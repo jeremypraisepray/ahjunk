@@ -1,0 +1,127 @@
+---
+import Icon from './Icon.astro';
+import { services } from '../data/services';
+import { cannotTake } from '../data/business';
+const home = services.filter((s) => s.home);
+const more = services.filter((s) => !s.home);
+---
+<section class="section" id="services" aria-labelledby="services-h">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="kicker"><span>What we haul</span></span>
+      <h2 class="h2" id="services-h">Point at it. We haul it.</h2>
+      <span class="ribbon" aria-hidden="true"></span>
+      <p class="lead">If it’s not hazardous, we take it — from a single recliner to a whole house. We do all the lifting, loading and sweeping.</p>
+    </div>
+
+    <ul class="svc-grid">
+      {home.map((s) => (
+        <li class="svc card" data-reveal>
+          <span class="svc__icon"><Icon name={s.icon as any} size={28} class="" /></span>
+          <h3 class="h3"><a href={`/services/${s.slug}/`}>{s.title}</a></h3>
+          <p>{s.short}</p>
+          <a class="link-arrow svc__cta" href={`?item=${s.item}#quote`} data-quote-item={s.item}>
+            Get a quote for this<span class="sr-only">: {s.title}</span> <Icon name="ArrowRight" size={18} class="" />
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    <div class="svc-more">
+      <p><strong>Also hauling:</strong>{' '}
+        {more.map((s, i) => <><a href={`/services/${s.slug}/`}>{s.title}</a>{i < more.length - 1 ? ' · ' : ''}</>)}
+      </p>
+      <details class="cant">
+        <summary><Icon name="Ban" size={18} class="" />What we can’t take</summary>
+        <p>For safety and disposal rules, we can’t haul: {cannotTake.join(', ').toLowerCase()}. Not sure about something? Text us a photo.</p>
+      </details>
+    </div>
+  </div>
+</section>
+<style>
+  .svc-grid {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  @media (min-width: 900px) {
+    .svc-grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+  }
+  .svc {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px;
+    position: relative;
+    transition: box-shadow 0.2s, transform 0.2s;
+  }
+  @media (min-width: 768px) {
+    .svc {
+      padding: 24px;
+    }
+  }
+  .svc:hover {
+    box-shadow: var(--shadow-lg);
+  }
+  .svc__icon {
+    display: inline-grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: #fff3eb;
+    color: var(--orange-text);
+    transform: skewX(var(--skew));
+  }
+  .svc__icon :global(svg) {
+    transform: skewX(6deg);
+  }
+  .svc h3 a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .svc h3 a:hover {
+    text-decoration: underline;
+  }
+  .svc p {
+    color: var(--muted);
+    font-size: 0.975rem;
+    flex: 1;
+  }
+  .svc__cta {
+    margin-top: 4px;
+    min-height: 44px;
+    font-size: 0.975rem;
+  }
+  @media (max-width: 480px) {
+    .svc .h3 {
+      font-size: 1.25rem;
+    }
+    .svc p {
+      font-size: 0.9375rem;
+    }
+  }
+  .svc-more {
+    display: grid;
+    gap: 12px;
+    margin-top: 28px;
+  }
+  .cant summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    font-weight: 700;
+    cursor: pointer;
+    color: var(--ah-blue);
+  }
+  .cant p {
+    color: var(--muted);
+    max-width: 70ch;
+  }
+</style>

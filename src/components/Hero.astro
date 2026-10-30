@@ -1,0 +1,230 @@
+---
+import { getImage } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import Icon from './Icon.astro';
+import Stars from './Stars.astro';
+import QuoteForm from './quote/QuoteForm.astro';
+import { business } from '../data/business';
+
+interface Props {
+  image: ImageMetadata;
+  kicker?: string;
+  preselect?: string;
+  formTitle?: string;
+}
+const { image, kicker = `${business.google.rating.toFixed(1)} on Google · Houston, TX`, preselect, formTitle } = Astro.props;
+const smsHref = `${business.phone.sms}?&body=${encodeURIComponent(business.smsBody)}`;
+
+// Art-directed background: a short 2:1 crop for the mobile banner, full frame on desktop.
+const build = async (widths: number[], format: 'avif' | 'webp', crop: boolean) =>
+  (await Promise.all(widths.map(async (w) => {
+    const img = await getImage({ src: image, width: w, ...(crop ? { height: Math.round(w / 2), fit: 'cover' as const } : {}), format, quality: 45 });
+    return `${img.src} ${w}w`;
+  }))).join(', ');
+const MOBILE = '(max-width: 1023.98px)';
+const sources = [
+  { media: MOBILE, type: 'image/avif', srcset: await build([480, 800, 1100], 'avif', true) },
+  { media: MOBILE, type: 'image/webp', srcset: await build([480, 800, 1100], 'webp', true) },
+  { media: undefined, type: 'image/avif', srcset: await build([1024, 1440, 1920], 'avif', false) },
+  { media: undefined, type: 'image/webp', srcset: await build([1024, 1440, 1920], 'webp', false) },
+];
+const fallback = await getImage({ src: image, width: 1440, format: 'webp', quality: 50 });
+---
+<section class="hero on-dark" aria-labelledby="hero-h">
+  <div class="hero__bg" aria-hidden="true">
+    <picture>
+      {sources.map((src) => <source media={src.media} type={src.type} srcset={src.srcset} sizes="100vw" />)}
+      <img src={fallback.src} width={fallback.attributes.width} height={fallback.attributes.height} alt="" loading="eager" fetchpriority="high" decoding="async" class="hero__img" />
+    </picture>
+  </div>
+  <div class="wrap hero__grid">
+    <div class="hero__copy">
+      <p class="kicker hero__kicker"><span><Stars rating={business.google.rating} label={`Rated ${business.google.rating} out of 5`} />{kicker}</span></p>
+      <slot name="heading" />
+      <div class="hero__more">
+        <slot name="sub" />
+        <ul class="proof-chips">
+          <li class="proof-chip"><Icon name="ShieldCheck" />Licensed &amp; Insured</li>
+          <li class="proof-chip"><Icon name="Zap" />Same-Day Service</li>
+          <li class="proof-chip"><Icon name="BadgeDollarSign" />No Hidden Fees</li>
+          {business.spanish && <li class="proof-chip">Hablamos Español</li>}
+        </ul>
+        <div class="hero__ctas">
+          <a class="btn btn--ghost-light" href={business.phone.tel} data-track="click_call" data-track-loc="hero"><Icon name="Phone" />Call {business.phone.display}</a>
+          <a class="hero__text" href={smsHref} data-track="click_text" data-track-loc="hero"><Icon name="Camera" size={20} class="" />Text us a photo <Icon name="ArrowRight" size={18} class="" /></a>
+        </div>
+      </div>
+    </div>
+    <div class="hero__form">
+      <QuoteForm preselect={preselect} title={formTitle} />
+    </div>
+  </div>
+  <div class="hero__strip" aria-hidden="true"></div>
+</section>
+<style>
+  .hero {
+    position: relative;
+    isolation: isolate;
+    background: var(--ah-ink);
+    overflow: hidden;
+  }
+  .hero__bg {
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 210px;
+    z-index: -1;
+    overflow: hidden;
+  }
+  .hero__bg :global(picture) {
+    display: block;
+    height: 100%;
+  }
+  .hero__bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgb(8 13 22 / 0.55) 0%, rgb(8 13 22 / 0.8) 60%, var(--ah-ink) 100%);
+  }
+  .hero :global(.hero__img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 30% 40%;
+  }
+  .hero__grid {
+    display: grid;
+    gap: 14px;
+    padding-block: 16px 28px;
+  }
+  .hero__kicker {
+    font-size: 0.8125rem;
+    padding: 4px 12px;
+    margin-bottom: 10px;
+  }
+  .hero__kicker :global(.stars svg) {
+    width: 14px;
+    height: 14px;
+  }
+  .hero :global(h1) {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-style: italic;
+    text-transform: uppercase;
+    font-size: clamp(2.35rem, 9.5vw, 4.75rem);
+    line-height: 0.92;
+    letter-spacing: 0.005em;
+    text-shadow: 0 2px 18px rgb(0 0 0 / 0.35);
+  }
+  .hero :global(h1 .accent) {
+    color: var(--orange-on-dark);
+  }
+  .hero :global(h1 .h1-sub) {
+    display: block;
+    margin-top: 6px;
+    font-size: 0.42em;
+    color: #fff;
+    letter-spacing: 0.02em;
+  }
+  .hero__more {
+    display: grid;
+    gap: 16px;
+  }
+  .hero :global(.hero__sub) {
+    font-size: 1.125rem;
+    color: #e9ecf1;
+    max-width: 52ch;
+  }
+  .hero__ctas {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 20px;
+  }
+  .hero__text {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    font-weight: 700;
+    color: #fff !important;
+    text-decoration: none;
+  }
+  .hero__text:hover {
+    text-decoration: underline;
+  }
+  .hero__strip {
+    height: 6px;
+    background: var(--ah-gradient);
+  }
+
+  /* Mobile: H1 → form → proof. The form wins. */
+  @media (max-width: 1023.98px) {
+    .hero__copy {
+      display: contents;
+    }
+    .hero__kicker,
+    .hero :global(h1) {
+      grid-row: auto;
+    }
+    .hero__form {
+      order: 2;
+    }
+    .hero__more {
+      order: 3;
+      margin-top: 8px;
+    }
+    .hero :global(h1 .h1-sub) {
+      display: none;
+    }
+  }
+  @media (min-width: 640px) and (max-width: 1023.98px) {
+    .hero__bg {
+      height: 260px;
+    }
+    .hero__form {
+      max-width: 640px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .hero__bg {
+      inset: 0;
+      height: auto;
+    }
+    .hero__bg::after {
+      background: linear-gradient(90deg, rgb(8 13 22 / 0.94) 0%, rgb(8 13 22 / 0.78) 45%, rgb(8 13 22 / 0.35) 75%, rgb(8 13 22 / 0.2) 100%);
+    }
+    .hero__grid {
+      grid-template-columns: 55fr 45fr;
+      gap: 48px;
+      align-items: center;
+      padding-block: 28px 32px;
+      min-height: calc(min(100vh, 900px) - var(--header-h) - 6px);
+    }
+    .hero__copy {
+      display: grid;
+      gap: 18px;
+      align-content: center;
+    }
+    .hero__kicker {
+      margin-bottom: 0;
+      font-size: 0.9375rem;
+    }
+    .hero :global(h1) {
+      font-size: clamp(3.5rem, 6vw, 5.5rem);
+    }
+    .hero__form {
+      max-width: 520px;
+      justify-self: end;
+      width: 100%;
+    }
+  }
+  @media (min-width: 1024px) and (max-height: 760px) {
+    .hero__grid {
+      padding-block: 18px 20px;
+    }
+    .hero :global(h1) {
+      font-size: clamp(3.25rem, 5.4vw, 4.75rem);
+    }
+  }
+</style>

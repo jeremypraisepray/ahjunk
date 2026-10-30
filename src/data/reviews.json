@@ -1,0 +1,29 @@
+{
+  "_comment": "Edit freely. source: 'google' shows the Google G mark — only use it for reviews actually copied from Google. TODO(owner): replace with real Google reviews.",
+  "reviews": [
+    {
+      "name": "Maria T.",
+      "area": "Bellaire",
+      "rating": 5,
+      "text": "Called in the morning and they cleared out our entire garage the same day. Fair price, and they swept up after themselves.",
+      "service": "Garage cleanout",
+      "source": "site"
+    },
+    {
+      "name": "James R.",
+      "area": "River Oaks",
+      "rating": 5,
+      "text": "After we lost my father, A&H handled his estate cleanout with real respect. Careful with everything, and cheaper than the national chains.",
+      "service": "Estate cleanout",
+      "source": "site"
+    },
+    {
+      "name": "Sandra K.",
+      "area": "West University",
+      "rating": 5,
+      "text": "On time, fast, and left the place spotless. The price they gave was the price I paid — no hidden fees.",
+      "service": "Furniture removal",
+      "source": "site"
+    }
+  ]
+}

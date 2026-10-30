@@ -1,0 +1,33 @@
+---
+/** "Open now · until 7 PM" — server renders hours, client computes live status in America/Chicago. */
+import { business } from '../data/business';
+const fmt = (h: number) => `${h % 12 || 12} ${h < 12 ? 'AM' : 'PM'}`;
+---
+<span class="open-status" data-open-status data-open={business.hours.open} data-close={business.hours.close} data-tz={business.timezone}>
+  <span class="open-status__dot" aria-hidden="true"></span>
+  <span data-open-text>Open 7 days · {fmt(business.hours.open)}–{fmt(business.hours.close)}</span>
+</span>
+<style>
+  .open-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .open-status__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #9aa3b2;
+  }
+  :global([data-open-status].is-open) .open-status__dot {
+    background: #12a150;
+    box-shadow: 0 0 0 3px rgb(18 161 80 / 0.2);
+  }
+  :global(.on-dark) .open-status {
+    color: var(--muted-on-dark);
+  }
+</style>

@@ -1,0 +1,125 @@
+---
+import Icon from './Icon.astro';
+import AreaMap from './AreaMap.astro';
+import ZipChecker from './ZipChecker.astro';
+import { areas } from '../data/areas';
+const hooks = [
+  { icon: 'CalendarCheck', t: 'Don’t want to wait for heavy-trash day?', d: 'We’ll be there today or tomorrow — no curb piles sitting for weeks.' },
+  { icon: 'CloudRainWind', t: 'Hurricane season cleanup', d: 'Storm limbs, soaked carpet and flood-damaged furniture hauled fast.' },
+  { icon: 'KeyRound', t: 'Move-outs near Rice, UH & the Med Center', d: 'Student and medical-resident move-outs cleared on a deadline.' },
+  { icon: 'ShieldCheck', t: 'HOA-friendly', d: 'Nothing left at the curb, no violation letters.' },
+];
+---
+<section class="section section--ink on-dark areas" id="areas" aria-labelledby="areas-h">
+  <div class="wrap areas__grid">
+    <div class="areas__copy">
+      <div class="section-head">
+        <span class="kicker"><span>Service area</span></span>
+        <h2 class="h2" id="areas-h">Proudly hauling across Greater Houston</h2>
+        <span class="ribbon" aria-hidden="true"></span>
+        <p class="lead">Inside the Loop, out past the Beltway and up to the Grand Parkway — River Oaks to Kingwood, Fulshear to Clear Lake.</p>
+      </div>
+      <ZipChecker />
+      <ul class="area-chips" aria-label="Neighborhoods and cities we serve">
+        {areas.map((a) => (
+          <li><a href={`/areas/${a.slug}/`} class:list={['area-chip', a.primary && 'is-primary']}>{a.name}<span class="area-chip__zip">{a.zips[0]}</span></a></li>
+        ))}
+      </ul>
+    </div>
+    <div class="areas__map" data-reveal>
+      <AreaMap />
+    </div>
+  </div>
+  <div class="wrap">
+    <ul class="hooks">
+      {hooks.map((h) => (
+        <li data-reveal><Icon name={h.icon as any} size={26} class="" /><div><h3>{h.t}</h3><p>{h.d}</p></div></li>
+      ))}
+    </ul>
+  </div>
+</section>
+<style>
+  .areas__grid > * {
+    min-width: 0;
+  }
+  .areas__grid {
+    display: grid;
+    gap: 32px;
+    align-items: center;
+  }
+  @media (min-width: 1024px) {
+    .areas__grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 56px;
+    }
+  }
+  .area-chips {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 20px;
+  }
+  .area-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid rgb(255 255 255 / 0.22);
+    color: #fff !important;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9375rem;
+  }
+  .area-chip.is-primary {
+    border-color: var(--ah-orange);
+  }
+  .area-chip:hover {
+    background: rgb(255 255 255 / 0.1);
+  }
+  .area-chip__zip {
+    font-size: 0.8125rem;
+    color: var(--muted-on-dark);
+  }
+  .hooks {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: 20px;
+    margin-top: 48px;
+  }
+  @media (min-width: 768px) {
+    .hooks {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (min-width: 1100px) {
+    .hooks {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+  .hooks li {
+    display: flex;
+    gap: 12px;
+    padding: 18px;
+    border-radius: var(--radius);
+    background: rgb(255 255 255 / 0.05);
+    border-left: 4px solid var(--ah-orange);
+  }
+  .hooks :global(svg) {
+    color: var(--orange-on-dark);
+    flex: none;
+  }
+  .hooks h3 {
+    font-size: 1.0625rem;
+    line-height: 1.25;
+    margin-bottom: 4px;
+  }
+  .hooks p {
+    color: var(--muted-on-dark);
+    font-size: 0.9375rem;
+  }
+</style>

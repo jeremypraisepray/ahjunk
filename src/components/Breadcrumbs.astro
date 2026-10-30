@@ -1,0 +1,46 @@
+---
+import { business } from '../data/business';
+interface Props { items: { name: string; href: string }[] }
+const { items } = Astro.props;
+const ld = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: items.map((it, i) => ({ '@type': 'ListItem', position: i + 1, name: it.name, item: new URL(it.href, business.url).href })),
+};
+---
+<nav class="crumbs" aria-label="Breadcrumb">
+  <ol class="wrap">
+    {items.map((it, i) => (
+      <li>{i < items.length - 1 ? <a href={it.href}>{it.name}</a> : <span aria-current="page">{it.name}</span>}</li>
+    ))}
+  </ol>
+</nav>
+<script type="application/ld+json" set:html={JSON.stringify(ld)} />
+<style>
+  .crumbs {
+    background: var(--ah-steel);
+    font-size: 0.875rem;
+  }
+  .crumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    list-style: none;
+    padding-block: 10px;
+  }
+  .crumbs li + li::before {
+    content: '/';
+    margin-right: 6px;
+    color: var(--muted);
+  }
+  .crumbs a {
+    color: var(--ah-blue);
+    display: inline-block;
+    padding-block: 4px;
+  }
+  .crumbs span {
+    color: var(--muted);
+    padding-block: 4px;
+    display: inline-block;
+  }
+</style>

@@ -1,0 +1,129 @@
+---
+import Base from '../../layouts/Base.astro';
+import Hero from '../../components/Hero.astro';
+import TrustBar from '../../components/TrustBar.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import Services from '../../components/Services.astro';
+import Reviews from '../../components/Reviews.astro';
+import AreaMap from '../../components/AreaMap.astro';
+import CTABand from '../../components/CTABand.astro';
+import Icon from '../../components/Icon.astro';
+import { areas, type Area } from '../../data/areas';
+import { business } from '../../data/business';
+import reviewsData from '../../data/reviews.json';
+import heroImg from '../../assets/photos/crew-loading-couch-dump-trailer.webp';
+
+export function getStaticPaths() {
+  return areas.map((a) => ({ params: { slug: a.slug }, props: { area: a } }));
+}
+const { area } = Astro.props as { area: Area };
+const dist = (a: Area, b: Area) => Math.hypot(a.lat - b.lat, (a.lng - b.lng) * 0.87);
+const nearby = areas.filter((a) => a.slug !== area.slug).sort((a, b) => dist(a, area) - dist(b, area)).slice(0, 6);
+const hasLocalReviews = reviewsData.reviews.some((r) => r.area === area.name);
+---
+<Base
+  title={`Junk Removal ${area.name}, TX (${area.zips[0]}) | ${business.name}`}
+  description={`Same-day junk removal in ${area.name}, TX — furniture, appliances, garage & estate cleanouts. ${area.hook}. Upfront pricing. Call ${business.phone.display}.`}
+  hasQuoteForm
+>
+  <Breadcrumbs items={[{ name: 'Home', href: '/' }, { name: 'Service areas', href: '/#areas' }, { name: area.name, href: `/areas/${area.slug}/` }]} />
+  <Hero image={heroImg} kicker={`${area.name}, TX · ${area.zips.join(' · ')}`}>
+    <h1 id="hero-h" slot="heading">Junk removal in <span class="accent">{area.name}</span></h1>
+    <p slot="sub" class="hero__sub">{area.blurb}</p>
+  </Hero>
+  <TrustBar />
+
+  <section class="section" aria-labelledby="local-h">
+    <div class="wrap local">
+      <div>
+        <div class="section-head">
+          <span class="kicker"><span>{area.name}, TX</span></span>
+          <h2 class="h2" id="local-h">{area.hook}</h2>
+          <span class="ribbon" aria-hidden="true"></span>
+          {/* TODO(copy): owner-written local paragraph — streets, landmarks, typical jobs in this area */}
+          <p class="lead">{area.blurb}</p>
+        </div>
+        <dl class="facts">
+          <div><dt>ZIP codes</dt><dd>{area.zips.join(', ')}</dd></div>
+          <div><dt>Hours</dt><dd>{business.hours.days}, {business.hours.label}</dd></div>
+          <div><dt>Availability</dt><dd>Same-day &amp; next-day</dd></div>
+        </dl>
+        <h3 class="h3 nearby-h">Nearby areas we serve</h3>
+        <ul class="nearby">
+          {nearby.map((a) => <li><a href={`/areas/${a.slug}/`}><Icon name="MapPin" size={16} class="" />{a.name}</a></li>)}
+        </ul>
+      </div>
+      <div class="local__map"><AreaMap highlight={area.slug} /></div>
+    </div>
+  </section>
+
+  <Services />
+  <Reviews filterArea={hasLocalReviews ? area.name : undefined} heading={hasLocalReviews ? `What ${area.name} says` : 'Houston says it best'} />
+  <CTABand heading={`Clearing out in ${area.name}?`} />
+</Base>
+<style>
+  .local > * {
+    min-width: 0;
+  }
+  .local {
+    display: grid;
+    gap: 36px;
+    align-items: center;
+  }
+  @media (min-width: 1024px) {
+    .local {
+      grid-template-columns: 1fr 1fr;
+      gap: 56px;
+    }
+  }
+  .facts {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  }
+  .facts div {
+    padding: 14px;
+    border-radius: var(--radius);
+    background: var(--ah-steel);
+  }
+  .facts dt {
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 700;
+    color: var(--muted);
+  }
+  .facts dd {
+    margin: 0;
+    font-weight: 700;
+  }
+  .nearby-h {
+    margin-top: 28px;
+  }
+  .nearby {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .nearby a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 44px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1.5px solid var(--line);
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--ah-ink);
+  }
+  .nearby a:hover {
+    border-color: var(--ah-orange);
+  }
+  .nearby :global(svg) {
+    color: var(--orange-text);
+  }
+</style>
